@@ -22,3 +22,7 @@ function getNumberFromString(inputString) {
   }
   return(parseInt(digits, 10));
 }
+
+checkStringLength('infinity', 10);
+isPalindrome('потоп');
+getNumberFromString('covid-19');
