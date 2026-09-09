@@ -28,9 +28,9 @@ thumbnail.addEventListener('click', (evt) => {
   }
   evt.preventDefault(); // Предотвращаем переход по ссылке, иначе получим http://localhost:3000/#
   const clickedPhotoId = Number(parentPicture.dataset.id); // При клике обработчик находит элемент <li class="picture"> через closest('.picture') и читает его dataset.id
-  const targetThumb = photos.find((photo) => photo.id === clickedPhotoId); // По data-id находим миниатюру в массиве
-  if (!targetThumb) {
-    return; // Защита от случая, если targetThumb === undefined
+  const targetThumbnail = photos.find((photo) => photo.id === clickedPhotoId); // По data-id находим миниатюру в массиве
+  if (!targetThumbnail) {
+    return; // Защита от случая, если targetThumbnail === undefined
   }
-  openBigPicture(targetThumb); // Передаём данные в функцию открытия модального окна
+  openBigPicture(targetThumbnail); // Передаём данные в функцию открытия модального окна
 });

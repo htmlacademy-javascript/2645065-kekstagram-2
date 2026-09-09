@@ -107,7 +107,7 @@ const onSliderUpdate = (values) => {
   const effect = EFFECTS[effectName];
   effectLevel.value = fieldValue; // Записываем значение ползунка в скрытое поле
   if (!effect || effectName === 'none') { // !effect — защита от ошибки; effectName === 'none' - удаление фильтра при выборе эффекта "Оригинал"
-    previewImage.style.filter = 'none';
+    previewImage.style.removeProperty('filter');
     return;
   }
   previewImage.style.filter = effect.applyFilter(fieldValue);
@@ -128,11 +128,12 @@ const updateSliderOptions = (effect) => {
 const applyInitialEffect = (effectName) => {
   const effect = EFFECTS[effectName];
   if (effectName === 'none') {
-    previewImage.style.filter = 'none'; // Если выбран эффект "Оригинал" (none), то удаляем все CSS-фильтры с изображения
+    previewImage.style.removeProperty('filter'); // Удаляем свойство filter
   } else {
-    previewImage.style.filter = effect.applyFilter(effect.start);
+    previewImage.style.filter = effect.applyFilter(effect.start); // Применяем фильтр со стартовой интенсивностью
   }
   effectLevel.value = effect.start;
+  sliderElement.noUiSlider.set(effect.start); // Синхронизируем слайдер со стартовым значением
 };
 
 // Функция применяет выбранный эффект

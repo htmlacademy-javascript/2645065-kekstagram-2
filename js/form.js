@@ -9,35 +9,35 @@ const MAX_SYMBOLS = 20;
 const MAX_LENGTH = 140;
 const RULES = [
   {
-    check: (tags) => tags.some((tag) => tag.slice(1).includes('#')),
+    check: (hastags) => hastags.some((hashtag) => hashtag.slice(1).includes('#')),
     message: 'Хэштеги разделяются пробелами'
   },
   {
-    check: (tags) => tags.some((tag) => tag.length > MAX_SYMBOLS),
+    check: (hastags) => hastags.some((hashtag) => hashtag.length > MAX_SYMBOLS),
     message: `Максимальная длина хэштега - ${MAX_SYMBOLS} символов, включая решётку`
   },
   {
-    check: (tags) => tags.some((tag) => !HASHTAG_REGEX.test(tag) && tag.length >= MIN_SYMBOLS), // каждый хэштег проверяется на то, соответствует ли он регулярному выражению + Проверка на минимальную длину - когда набрана ещё только решётка, то не показывается сообщение о буквах и цифрах
+    check: (hastags) => hastags.some((hashtag) => !HASHTAG_REGEX.test(hashtag) && hashtag.length >= MIN_SYMBOLS), // каждый хэштег проверяется на то, соответствует ли он регулярному выражению + Проверка на минимальную длину - когда набрана ещё только решётка, то не показывается сообщение о буквах и цифрах
     message: 'Хэштег должен содержать только буквы и цифры'
   },
   {
-    check: (tags) => tags.some((tag) => tag === '#'),
+    check: (hastags) => hastags.some((hashtag) => hashtag === '#'),
     message: 'Хэштег не может состоять только из одной решётки'
   },
   {
-    check: (tags) => tags.some((tag) => tag[0] !== '#'),
+    check: (hastags) => hastags.some((hashtag) => hashtag[0] !== '#'),
     message: 'Хэштег должен начинаться с символа #'
   },
   {
-    check: (tags) => {
-      const lowerCaseTags = tags.map((tag) => tag.toLowerCase()); // На случай, если один и тот же хэштег встречается в разных регистрах
-      const newLowerCaseTags = new Set(lowerCaseTags); // Убираем повторяющиеся хэштеги (если они есть)
-      return lowerCaseTags.length !== newLowerCaseTags.size;
+    check: (hastags) => {
+      const lowerCaseHashtags = hastags.map((hashtag) => hashtag.toLowerCase()); // На случай, если один и тот же хэштег встречается в разных регистрах
+      const newLowerCaseHashtags = new Set(lowerCaseHashtags); // Убираем повторяющиеся хэштеги (если они есть)
+      return lowerCaseHashtags.length !== newLowerCaseHashtags.size;
     },
     message: 'Хэштеги не должны повторяться'
   },
   {
-    check: (tags) => tags.length > MAX_HASHTAGS,
+    check: (hastags) => hastags.length > MAX_HASHTAGS,
     message: `Нельзя указывать больше ${MAX_HASHTAGS} ${getHashtagForm(MAX_HASHTAGS)}`
   }
 ];
@@ -52,7 +52,7 @@ let errorMessage = '';
 
 const pristine = new Pristine(imageUploadForm, {
   classTo: 'img-upload__field-wrapper', // Элемент, на который будут добавляться классы
-  errorClass: 'img-upload__field-wrapper--error', // Класс, обозначающий невалидное поле
+  errorTextClass: 'img-upload__field-wrapper--error', // Класс с текстом ошибки
   errorTextParent: 'img-upload__field-wrapper', // Элемент, куда будет выводиться текст с ошибкой
 });
 
@@ -108,9 +108,9 @@ const validateHashtags = (value) => {
   if (trimmedValue === '') {
     return true; // если массив пуст, ошибок нет
   }
-  const tags = trimmedValue.split(/\s+/); // Получаем из строки с хэштегами массив
+  const hastags = trimmedValue.split(/\s+/); // Получаем из строки с хэштегами массив
   return RULES.every((rule) => {
-    const isError = rule.check(tags);
+    const isError = rule.check(hastags);
     if(isError) {
       errorMessage = rule.message;
     }
@@ -120,11 +120,16 @@ const validateHashtags = (value) => {
 
 const validateDescription = (value) => value.length <= MAX_LENGTH;
 
-fileCloseElement.addEventListener('click', closeFileToEdit);
+const onFormCancel = () => closeFileToEdit();
 
-hashtags.addEventListener('keydown', stopEscapePropagation);
+const onHashtagsKeydown = (evt) => stopEscapePropagation(evt);
+const onDescriptionKeydown = (evt) => stopEscapePropagation(evt);
 
-description.addEventListener('keydown', stopEscapePropagation);
+fileCloseElement.addEventListener('click', onFormCancel);
+
+hashtags.addEventListener('keydown', onHashtagsKeydown);
+
+description.addEventListener('keydown', onDescriptionKeydown);
 
 pristine.addValidator(hashtags, validateHashtags, getErrorMessage);
 pristine.addValidator(description, validateDescription, `Длина описания - не более ${MAX_LENGTH} символов`);
@@ -140,4 +145,4 @@ imageUploadForm.addEventListener('submit', (evt) => {
   onFormSubmit(formData, closeFileToEdit);
 });
 
-export { closeFileToEdit, fileInput, openFileToEdit };
+export { fileInput, openFileToEdit };
